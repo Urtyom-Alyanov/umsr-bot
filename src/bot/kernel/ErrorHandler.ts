@@ -1,4 +1,4 @@
-import {ResponseMessage} from "../../types/ResponseMessage.js";
+import {ResponseMessage} from "../../shared/types/ResponseMessage.js";
 import {Attachment, ButtonColor, Keyboard} from "vk-io";
 import {BotConfig} from "../cfg.js";
 

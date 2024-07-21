@@ -1,0 +1,1 @@
+export type PassportInputKeysEnum = "name" | "surname" | "date" | "nation" | "patronymicname" | "gender" | "placeOfBirthRepublic" | "placeOfBirthCity" | "id" | "sign";

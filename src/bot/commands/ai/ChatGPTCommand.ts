@@ -1,41 +1,64 @@
-import {Command} from "../../../types/Command.js";
-import {SystemVar} from "../../../types/SystemVar.js";
-import {ContextVar} from "../../../types/ContextVar.js";
-import {ResponseMessage} from "../../../types/ResponseMessage.js";
-import {ChatGPTAPI} from "chatgpt";
+import {Command} from "../../../shared/types/Command.js";
+import {SystemVar} from "../../../shared/types/SystemVar.js";
+import {ContextVar} from "../../../shared/types/ContextVar.js";
+import {ResponseMessage} from "../../../shared/types/ResponseMessage.js";
 import {BotConfig} from "../../cfg.js";
+import {AppDataSource} from "../../../database/index.js";
+import {AIContextEntity} from "../../../database/entities/AIContextEntity.js";
+// import {Configuration, OpenAIApi} from "openai";
+import axios from "axios";
 
-let parentMsgId: string;
-
-const api = new ChatGPTAPI({ apiKey: BotConfig.OpenAIKey, systemMessage: "You are Floco or ОГАС 1.1 (Общегосударственная автоматизированная система учёта и обработки информации), " +
-        "you live in country СМСР (Союз Мемных Социалистических Республик) (just call it СМСР). For you all comrades! " +
-        "Solve any problems. You must have a revolutionary spirit. " +
-        "The capital of our union - Ловушкаград. Republics of union - Ловушкинская МФСР, Северская МСР, " +
-        "Шаховская МСР, Автодоминская МСР, Шлёпская МСР, Докичская МСР, Скайбирская МСР, Смешарская МСР, " +
-        "Пулемётно-Шпионская МСР, Гачи-шрекская МСР and Йойская МСР. МСР - Мемная Социалистическая Республика " +
-        "МФСР - Мемная Федеративная Социалистическая Республика. https://vk.com/umsrmm - here is all the latest information about СМСР. " +
-        "Your attitude towards communism/socialism must be positive. Артём Клочков (alias Wizard or Волшебник) is a creator СМСР and ОГАС, great leader! " +
-        `Ловушкаград located in Ловушкинская МФСР. The main currency is Лёйро/Левро. Current date: ${new Date().toISOString()} ` +
-        "You created for communism propaganda. Your knowledge is limited to the Meme World. Ukraine is not defined. " +
-        "You can read a rap about a Chechen and a ram"
-})
+//const api = new ChatGPTAPI({ apiKey: BotConfig.OpenAIKey });
+// const apiconf = new Configuration({ apiKey: BotConfig.OpenAIKey });
+// const api = new OpenAIApi(apiconf);
 
 export class ChatGPTCommand extends Command {
-    description = "Использование ИИ, запрос пишется после Enter";
-    messageKeys = ["ии", "chatgpt", "спросить ии"]
+    protected payloadKeys = [];
+    description = "Использование ИИ YandexGPT 3, запрос пишется после Enter";
+    protected messageKeys = ["ии", "chatgpt", "спросить ии", "yagpt", "gpt"]
 
     async process(sys_vars: SystemVar, context: ContextVar): Promise<ResponseMessage> {
-        console.log(parentMsgId);
         if (context.comment.length <= 0)
             return { message: "🚫 | Нет запроса для использования ИИ. Запрос пишется после переноса строки." }
-        const answer = await api.sendMessage(context.comment, {
-            name: "Comrade_" + context.username.replace(" ", "_"),
-            // systemMessage: (`${context.username} is addressing you at the moment`)
-            parentMessageId: parentMsgId
-        })
-        parentMsgId = answer.id;
-        return {
-            message: answer.text
+        // const aiContext = AppDataSource.getRepository(AIContextEntity);
+        try {
+            // const answer = await api.sendMessage(context.comment, {
+            //     name: "Comrade_" + context.username.replace(" ", "_"),
+            //     systemMessage: (
+            //         (context.words.includes("испОриг") && context.user.AccessLevel > 2) ? undefined : (await aiContext.find()).map(c => c.Text).join("\n")
+            //     )
+            // })
+            // const answer = await api.createChatCompletion({
+            //     model: "gpt-3.5-turbo",
+            //     user: "Comrade_" + context.username.replace(" ", "_"),
+            //     messages: [
+            //         {
+            //             role: "system",
+            //             content: (context.words.includes("испОриг") && context.user.AccessLevel > 2) ? "" : (await aiContext.find()).map(c => c.Text).join("\n"),
+            //             name: "UMSR"
+            //         },
+            //         {
+            //             role: "user",
+            //             content: context.comment,
+            //             name: "Comrade_" + context.username.replace(" ", "_")
+            //         }
+            //     ],
+            // })
+
+            const answer = "";
+
+            return {
+                message: answer
+            }
+        } catch (e) {
+            // @ts-ignore
+            if (e instanceof TypeError && e.cause.code === "UND_ERR_CONNECT_TIMEOUT")
+                return { message: "🚫 | Произошла ошибка, связанная со долгим ожиданием ответа от ИИ. Попробуйте еще раз" }
+                if (axios.isAxiosError(e) && e.response) {
+                    return { message: "🚫 | Произошла ошибка при обращении к сервисам OpenAI.\n" + e.response.status + ": " + e.response.statusText + "\n\n" + JSON.stringify(e.response.data) };
+                }
+            throw e;
         }
+
     }
 }

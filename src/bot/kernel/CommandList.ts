@@ -1,3 +1,3 @@
-import {Command} from "../../types/Command.js";
+import {Command} from "../../shared/types/Command.js";
 
 export const CommandList: Command[] = [];
