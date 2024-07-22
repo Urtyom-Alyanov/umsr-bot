@@ -47,7 +47,7 @@ export class MVDPassportCommand extends Command {
                 await this.vk.api.messages.send({
                     message: `📖 | Ваш паспорт был отправлен на доработку. Мы открываем вам обработчик сообщений паспорта...\n\nКомментарий:\n${comment}`,
                     random_id: getRandomId(),
-                    user_id: confirmUser.VkId
+                    peer_id: confirmUser.VkId
                 });
                 const splitedDate = Passport.Date.split(".");
                 await this.handlerReroute<PassportCreateState>(confirmUser, "passport_creating", {
@@ -67,7 +67,7 @@ export class MVDPassportCommand extends Command {
                 await this.vk.api.messages.send({
                     message: "📖 | Ваш паспорт отклонён. Причина:\n" + comment,
                     random_id: getRandomId(),
-                    user_id: confirmUser.VkId
+                    peer_id: confirmUser.VkId
                 });
                 return {
                     message: `📖 | Паспорт [id${confirmUser.VkId}|пользователя ${confirmUser.Name}] отныне не явялется подтверждённым полностью. Причина:\n ${comment}`
@@ -92,7 +92,7 @@ export class MVDPassportCommand extends Command {
         await this.vk.api.messages.send({
             message: "📖 | Поздравляем Вас с получением гражданства Ловушкинской Федеративной Республики! С паспортом Ловушкинска вы можете, пока что, участвовать в выборах и получать государственные должности.",
             random_id: getRandomId(),
-            user_id: confirmUser.VkId,
+            peer_id: confirmUser.VkId,
             keyboard: new KeyboardBuilder().inline().callbackButton({ payload: { command: "show_passport" }, label: "Показать паспорт" })
         });
         return {
