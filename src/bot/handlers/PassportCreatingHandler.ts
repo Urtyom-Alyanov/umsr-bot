@@ -238,7 +238,7 @@ export class PassportCreatingHandler extends MsgHandler<PassportCreateState> {
                             await this.bufferToAttachment(await this.getBufferImageFromUrl(state.PhotoUrl))
                         ],
                         random_id: getRandomId(),
-                        user_ids: getMVD()
+                        peer_ids: getMVD()
                     });
                 await this.handlerReroute("commands");
                 return {
